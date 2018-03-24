@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>Echarts基本使用</title>
+		<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+		<script src="js/echarts.min.js"></script>
+		<script src="js/dark.js"></script>
+		<script src="js/infographic.js"></script>
+		<script src="js/macarons.js"></script>
+		<script src="js/shine.js"></script>
+		<script src="js/vintage.js"></script>
+
+	</head>
+
+	<body>
+		<div>
+			<select class="triggerEcharts">
+				<option>-请选择-</option>
+				<option>vintage</option>
+				<option>shine</option>
+				<option>macarons</option>
+				<option>infographic</option>
+				<option>dark</option>
+			</select>
+		</div>
+
+		<div id="dataBroken">
+			<div class="canvas" style="width:100%;height:800px"></div>
+		</div>
+		<script>
+			var dataAxis = ['点', '击', '柱', '子', '或', '者', '两', '指', '在', '触', '屏', '上', '滑', '动', '能', '够', '自', '动', '缩', '放'];
+			var data = [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220];
+			var yMax = 500;
+			var dataShadow = [];
+			/*******echarts图表渲染开始*********************/
+			var option = {};
+			$(".triggerEcharts").change(function(e) {
+				try {
+					////echarts.getInstanceByDom()  获取 dom 容器上的实例
+					//  dispose 销毁实例，销毁后实例无法再被使用。
+					echarts.getInstanceByDom($('#dataBroken').find('div')[0]).dispose();//
+				} catch(ex) {}
+				var theme = $(this).val();
+				setTimeout(function() {
+					var brokenChart = echarts.init($('#dataBroken').find('div')[0], theme);
+					brokenChart.setOption(option);
+				}, 500);//等DOM渲染出来的后再初始化
+			})
+			/*******echarts图表渲染结束*********************/
+
+			for(var i = 0; i < data.length; i++) {
+				dataShadow.push(yMax);
+			}
+
+			option = {
+				title: {
+					text: '特性示例：渐变色 阴影 点击缩放',
+					subtext: 'Feature Sample: Gradient Color, Shadow, Click Zoom',
+					left: 'center',
+				},
+				xAxis: {
+					data: dataAxis,
+					axisLabel: {
+						inside: true,
+						textStyle: {
+							color: '#fff'
+						}
+					},
+					axisTick: {
+						show: false
+					},
+					axisLine: {
+						show: false
+					},
+					z: 10
+				},
+				yAxis: {
+					axisLine: {
+						show: false
+					},
+					axisTick: {
+						show: false
+					},
+					axisLabel: {
+						textStyle: {
+							color: '#999'
+						}
+					}
+				},
+				dataZoom: [{
+					type: 'inside'
+				}],
+				series: [{ // For shadow
+						type: 'bar',
+						itemStyle: {
+							normal: {
+								color: 'rgba(0,0,0,0.05)'
+							}
+						},
+						barGap: '-100%',
+						barCategoryGap: '40%',
+						data: dataShadow,
+						animation: false
+					},
+					{
+						type: 'bar',
+						itemStyle: {
+							normal: {
+								color: new echarts.graphic.LinearGradient(
+									0, 0, 0, 1, [{
+											offset: 0,
+											color: '#83bff6'
+										},
+										{
+											offset: 0.5,
+											color: '#188df0'
+										},
+										{
+											offset: 1,
+											color: '#188df0'
+										}
+									]
+								)
+							},
+							emphasis: {
+								color: new echarts.graphic.LinearGradient(
+									0, 0, 0, 1, [{
+											offset: 0,
+											color: '#2378f7'
+										},
+										{
+											offset: 0.7,
+											color: '#2378f7'
+										},
+										{
+											offset: 1,
+											color: '#83bff6'
+										}
+									]
+								)
+							}
+						},
+						data: data
+					}
+				]
+			};
+
+			// Enable data zoom when user click bar.
+			var zoomSize = 6;
+			brokenChart = echarts.init($('#dataBroken').find('div')[0], 'shine');
+			brokenChart.on('click', function(params) {
+				console.log(dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)]);
+				brokenChart.dispatchAction({
+					type: 'dataZoom',
+					startValue: dataAxis[Math.max(params.dataIndex - zoomSize / 2, 0)],
+					endValue: dataAxis[Math.min(params.dataIndex + zoomSize / 2, data.length - 1)]
+				});
+			});
+			brokenChart.setOption(option);
+		</script>
+	</body>
+
+</html>
